@@ -15,11 +15,14 @@ dnf5 clean all
 # Clean temporary files
 rm -rf /tmp/* || true
 
-# Cleanup the entirety of `/var`.
-# None of these get in the end-user system and bootc lints get super mad if anything is in there
-rm -rf /var
+# Cleanup the entirety of `/var` except active mount points.
+# None of these get in the end-user system and bootc lints get super mad if anything is in there.
+find /var -mindepth 1 -maxdepth 1 -not -name 'cache' -not -name 'log' -exec rm -rf {} + || true
+rm -rf /var/cache/* /var/log/* || true
+
 mkdir -p /var/tmp
 chmod -R 1777 /var/tmp
+
 
 # Commit and lint container
 bootc container lint || true
