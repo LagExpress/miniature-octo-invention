@@ -25,9 +25,20 @@ fi
 if [[ -f /usr/lib/os-release ]]; then
     sed -i 's/Bazzite/LagOS/g' /usr/lib/os-release
     sed -i 's/bazzite/lagos/g' /usr/lib/os-release
-    sed -i 's/^ID_LIKE=.*/ID_LIKE="bazzite fedora"/' /usr/lib/os-release
-    sed -i "s/^VARIANT_ID=.*/VARIANT_ID=$INTERNAL_IMAGE_NAME/" /usr/lib/os-release
+
+    if grep -q '^ID_LIKE=' /usr/lib/os-release; then
+        sed -i 's/^ID_LIKE=.*/ID_LIKE="bazzite fedora"/' /usr/lib/os-release
+    else
+        echo 'ID_LIKE="bazzite fedora"' >> /usr/lib/os-release
+    fi
+
+    if grep -q '^VARIANT_ID=' /usr/lib/os-release; then
+        sed -i "s/^VARIANT_ID=.*/VARIANT_ID=$INTERNAL_IMAGE_NAME/" /usr/lib/os-release
+    else
+        echo "VARIANT_ID=$INTERNAL_IMAGE_NAME" >> /usr/lib/os-release
+    fi
 fi
+
 
 # KDE About page
 if [[ -f /etc/xdg/kcm-about-distrorc ]]; then

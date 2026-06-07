@@ -10,7 +10,7 @@ log() {
 log "Building initramfs"
 
 # Get kernel version and build initramfs
-KERNEL_VERSION="$(rpm -q --queryformat='%{evr}.%{arch}' kernel)"
+KERNEL_VERSION="$(rpm -q --queryformat='%{evr}.%{arch}\n' kernel | tail -n 1)"
 /usr/bin/dracut \
   --no-hostonly \
   --kver "$KERNEL_VERSION" \
