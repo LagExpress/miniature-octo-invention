@@ -1,24 +1,25 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -eo pipefail
 
-set -ouex pipefail
+BUILD_SCRIPTS_PATH="$(realpath "$(dirname "$0")")"
 
-### Install packages
+# Run scripts in order
+scripts=(
+    "00-lagos-branding.sh"
+    "20-install-packages.sh"
+    "50-fix-opt.sh"
+    "99-build-initramfs.sh"
+    "999-cleanup.sh"
+)
 
-# Packages can be installed from any enabled yum repo on the image.
-# RPMfusion repos are available by default in ublue main images
-# List of rpmfusion packages can be found here:
-# https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/43/x86_64/repoview/index.html&protocol=https&redirect=1
-
-# this installs a package from fedora repos
-dnf5 install -y tmux 
-
-# Use a COPR Example:
-#
-# dnf5 -y copr enable ublue-os/staging
-# dnf5 -y install package
-# Disable COPRs so they don't end up enabled on the final image:
-# dnf5 -y copr disable ublue-os/staging
-
-#### Example for enabling a System Unit File
-
-systemctl enable podman.socket
+for script in "${scripts[@]}"; do
+    script_path="${BUILD_SCRIPTS_PATH}/${script}"
+    if [ -f "$script_path" ]; then
+        printf "::group:: === %s ===\n" "$script"
+        /usr/bin/bash "$script_path"
+        printf "::endgroup::\n"
+    else
+        echo "Script not found: $script_path"
+        exit 1
+    fi
+done
