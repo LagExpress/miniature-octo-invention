@@ -16,8 +16,7 @@ for script in "${scripts[@]}"; do
     script_path="${BUILD_SCRIPTS_PATH}/${script}"
     if [ -f "$script_path" ]; then
         printf "::group:: === %s ===\n" "$script"
-        chmod +x "$script_path"
-        "$script_path"
+        /usr/bin/bash "$script_path"
         printf "::endgroup::\n"
     else
         echo "Script not found: $script_path"
